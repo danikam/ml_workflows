@@ -1,0 +1,8 @@
+stages:
+- name: full_ml
+  dependencies: []
+  scheduler:
+    scheduler_type: singlestep-stage
+    parameters:
+      outfile: '{workdir}/ml_results.png'
+    step: {$ref: 'steps.yml#/full_ml_step'}

@@ -1,0 +1,13 @@
+full_ml_step:
+  process:
+    process_type: 'interpolated-script-cmd'
+    script: |
+      python /fun_with_ml/full_run.py --outfile {outfile}
+  environment:
+    environment_type: 'docker-encapsulated'
+    image: danikam/sklearn
+    imagetag: latest
+  publisher:
+    publisher_type: interpolated-pub
+    publish: 
+      ml_results: '{outfile}'
