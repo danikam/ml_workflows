@@ -1,0 +1,8 @@
+dataset: 'https://www.dropbox.com/s/ovyxd3q4td7jd3m/moon.txt?dl=1'
+classifiers:
+  - 'nearest_neighbours'
+  - 'linear_svm'
+  - 'rbf_svm'
+  - 'gaussian_process'
+  - 'decision_tree'
+

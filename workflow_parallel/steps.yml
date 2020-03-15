@@ -1,0 +1,45 @@
+data_prep_step:
+  process:
+    process_type: 'interpolated-script-cmd'
+    script: |
+      python /fun_with_ml/data_prep.py --dataset {dataset} --outfile {outfile}
+  environment:
+    environment_type: 'docker-encapsulated'
+    image: danikam/sklearn
+    imagetag: latest
+  publisher:
+    publisher_type: interpolated-pub
+    publish: 
+      prepped_data: '{outfile}'
+
+classification_step:
+  process:
+    process_type: 'interpolated-script-cmd'
+    script: |
+      for classifier in {all_classifiers}; do
+        python /fun_with_ml/classification.py --prepped_data {input_data} --classifier $classifier --outfile {outdir}/$classifier.pkl
+      done
+  environment:
+    environment_type: 'docker-encapsulated'
+    image: danikam/sklearn
+    imagetag: latest
+  publisher:
+    publisher_type: interpolated-pub
+    publish:
+      ml_output: '{outdir}/*.pkl'
+
+merging_step:
+  process:
+    process_type: 'interpolated-script-cmd'
+    script: |
+      python /fun_with_ml/merge_and_plot.py {input_data} {outfile} {ml_inputs}
+  environment:
+    environment_type: 'docker-encapsulated'
+    image: danikam/sklearn
+    imagetag: latest
+  publisher:
+    publisher_type: interpolated-pub
+    publish:
+      ml_result: '{outfile}'
+
+

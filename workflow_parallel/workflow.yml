@@ -1,0 +1,32 @@
+stages:
+- name: data_prep
+  dependencies: [init]
+  scheduler:
+    scheduler_type: singlestep-stage
+    parameters:
+      dataset: {step: init, output: dataset}
+      outfile: '{workdir}/prepped_data.pkl'
+    step: {$ref: 'steps.yml#/data_prep_step'}
+
+- name: classification
+  dependencies: [data_prep, init]
+  scheduler:
+    scheduler_type: multistep-stage
+    parameters:
+      input_data: {step: data_prep, output: prepped_data}
+      all_classifiers: {step: init, output: classifiers}
+      outdir: '{workdir}'
+    scatter:
+      method: zip
+      parameters: [all_classifiers]
+    step: {$ref: 'steps.yml#/classification_step'}
+
+- name: merging
+  dependencies: [classification, data_prep]
+  scheduler:
+    scheduler_type: singlestep-stage
+    parameters:
+      input_data: {step: data_prep, output: prepped_data}
+      ml_inputs: {stages: classification, output: ml_output, flatten: true}
+      outfile: '{workdir}/ml_results.png'
+    step: {$ref: 'steps.yml#/merging_step'}
